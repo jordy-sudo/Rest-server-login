@@ -1,41 +1,19 @@
-const mogoose = require('mongoose');
-const uniqueValidator = require('mongoose-unique-validator');
-
-
-let Schema = mogoose.Schema;
-
-let rolesValidos = {
-    values: ['ADMIN_ROLE', 'USER_ROLE'],
-    message: '{VALUE} no es un rol válido'
-}
+const mongoose = require('mongoose');
+let Schema = mongoose.Schema;
 
 let usuarioSchema = new Schema({
-    caja:{
+    caja: {
         type: Number,
-        required: [true, 'El numero de caja es obligatorio']
+        required: [true, "El campo caja es obligatorio"]
     },
-    fecha:{
-        type: Date,
-        required: [true, 'La fecha es obligatoria']
-    },
-    hora:{
+    fecha: {
         type: String,
-        required: [true, 'La hora es obligatoria']
+        required: [true, "La fecha es obligatoria"]
     },
-    estado: {
-        type:Boolean,
-        default: true
+    hora: {
+        type: String,
+        required: [true, "La hora es oblgatorio"]
     }
-});
+})
 
-usuarioSchema.plugin(uniqueValidator, {message: '{PATH} debe ser único'});
-
-usuarioSchema.methods.toJSON = function () {
-    let user = this;
-    let userObjet = user.toObject();
-    delete userObjet.password;
-
-    return userObjet;
-}
-
-module.exports = mogoose.model('Usuario', usuarioSchema);
+module.exports = mongoose.model('Usuario', usuarioSchema)

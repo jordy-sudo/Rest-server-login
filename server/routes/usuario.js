@@ -1,122 +1,113 @@
-const express = require("express");
-const Usuario = require("../models/usuario");
-const bcrypt = require('bcrypt');
-const _ = require('underscore');
-
+const express = require('express');
 const app = express();
-
-app.get("/usuario", function (req, res) {
-
-  let desde = req.query.desde || 0;
-  desde = Number(desde);
-
-  let limite = req.query.limite || 5;
-  limite = Number(limite);
-
-  Usuario.find({estado:true}, 'caja fecha hora estado')
-    .skip(desde)
-    .limit(limite)
-    .exec((err, usuarios) => {
-      if (err) {
-        return res.status(400).json({
-          ok: false,
-          err,
-        });
-      }
-
-      Usuario.count({estado:true}, (err, conteo) => {
-        res.json({
-          ok: true,
-          registros: conteo,
-          usuarios
-        });
-      });
-  });
-});
+const Usuario = require('../models/usuario');
 
 
+app.get('/usuario', function(req, res) {
+    let desde = req.query.desde || 0;
+    desde = Number(desde);
 
-app.post("/usuario", function (req, res) {
-  let body = req.body;
+    let hasta = req.query.hasta || 10;
+    hasta = Number(hasta);
 
-  let usuario = new Usuario({
-    caja: body.caja,
-    fecha: body.fecha,
-    hora: body.hora,
-    estado: body.estado
-  });
+    let soli = "";
+    let fechaSoli = req.query.fecha || null;
+    let horaSoli = req.query.hora || null;
+    
+    if (fechaSoli === null && horaSoli === null) {
+        soli = {
 
-  usuario.save((err, usuarioDB) => {
-    if (err) {
-      return res.status(400).json({
-        ok: false,
-        err,
-      });
-    }
-
-    res.json({
-        ok: true,
-        usuario: usuarioDB
-      });
-  });
-
-});
-
-app.put("/usuario/:id", function (req, res) {
-  let id = req.params.id;
-  let body = _.pick(req.body, ['caja','fecha','hora','estado']);
-
-  
-
-  Usuario.findByIdAndUpdate(id, body, {new:true, runValidators: true, context: 'query'}, (err, usuarioDB) =>{
-
-    if (err) {
-      return res.status(400).json({
-        ok: false,
-        err,
-      });
-    }
-
-    res.json({
-      ok: true,
-      usuario: usuarioDB
-    });
-
-  });
-});
-
-app.delete("/usuario/:id", function (req, res) {
-  let id = req.params.id;
-
-  let cambiarEstado = {
-    estado: false
-  }
-
-  // Usuario.findByIdAndDelete(id, (err, usuarioEliminado) => {
-  Usuario.findByIdAndUpdate(id, cambiarEstado, {nre: true, context:'query'}, (err, usuarioDB) => {
-    if (err){
-      return res.status(400).json({
-        ok: false,
-        err,
-      });
-    }
-
-    if (!usuarioDB){
-      return res.status(400).json({
-        ok: false,
-        error: {
-          message: 'Usuario no encontrado en la BDD'
         }
-      });
+    }
+    if (fechaSoli != null && horaSoli != null) {
+        soli = {
+            fecha: fechaSoli,
+            hora: horaSoli
+        }
+    }
+    if (fechaSoli != null && horaSoli === null) {
+        soli = {
+            fecha: fechaSoli
+        }
     }
 
-    res.json({
-      ok: true,
-      usuario: usuarioDB
-    });
+    if (horaSoli != null && fechaSoli === null) {
+        soli = {
+            hora: horaSoli
+        }
+    }
 
-  });
 
-});
+    Usuario.find(soli, 'caja fecha hora')
+        .skip(desde)
+        .limit(hasta)
+        .exec((err, cajas) => {
+            if (err) {
+                return res.status(400).json({
+                    ok: false,
+                    err
+                })
+            }
+
+            Usuario.count(soli, (err, conteo) => {
+                res.json({
+                    ok: true,
+                    registros: conteo,
+                    cajas
+                })
+            })
+        })
+})
+
+app.post('/usuario', function(req, res) {
+    let fecha = new Date()
+    let body = req.body;
+    let info = new Usuario({
+        caja: body.caja,
+        fecha: fecha.getDate() + "/" + fecha.getMonth() + 1 + "/" + fecha.getFullYear(),
+        hora: fecha.getHours() + ":" + fecha.getMinutes()
+    })
+    info.save((err, cajaDB) => {
+        if (err) {
+            res.status(400).json({
+                ok: false,
+                err
+            })
+        } else {
+            res.json({
+                ok: true,
+                Usuario: cajaDB
+            })
+        }
+
+    })
+})
+
+
+
+app.delete('/usuario/:id', function(req, res) {
+    let id = req.params.id;
+
+    Usuario.findByIdAndDelete(id, (err, regCajaEliminado) => {
+        if (err) {
+            return res.status(400).json({
+                ok: false,
+                err
+            })
+        }
+        if (regCajaEliminado === null) {
+            return res.status(400).json({
+                ok: false,
+                error: {
+                    message: 'Este registro no existe '
+                }
+            })
+        }
+        res.json({
+            ok: true,
+            usuario: regCajaEliminado
+        })
+    })
+})
 
 module.exports = app;

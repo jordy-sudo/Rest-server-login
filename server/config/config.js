@@ -15,9 +15,10 @@ process.env.NODE_ENV = process.env.NODE_ENV || 'dev000';
 let urlDB;
 
 if (process.env.NODE_ENV === 'dev'){
-    urlDB = "mongodb://localhost:27017/liquid";
+    urlDB = "mongodb+srv://test1:test1@cluster0.zwjcs.mongodb.net/infinity";
+   
 }else {
-    urlDB = "mongodb+srv://test1:test1@cluster0.zwjcs.mongodb.net/liquid"
+    urlDB = "mongodb+srv://test1:test1@cluster0.zwjcs.mongodb.net/infinity";
              
 }
 
