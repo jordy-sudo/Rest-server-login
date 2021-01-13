@@ -22,35 +22,9 @@ let usuarioSchema = new Schema({
         type: String,
         required: [true, 'La hora es obligatoria']
     },
-    nombre: {
-        type: String,
-        required: [true, 'El nombre es requerido']
-    },
-    email: {
-        type: String,
-        required: [true, 'El e-mail es necesario'],
-        unique: true
-    },
-    password: {
-        type: String,
-        required: [true, 'El password es obligatorio']
-    },
-    img: {
-        type: String,
-        required: false
-    },
-    role: {
-        type: String,
-        default: 'USER_ROLE',
-        enum: rolesValidos
-    },
     estado: {
         type:Boolean,
         default: true
-    },
-    google: {
-        type: Boolean,
-        default: false
     }
 });
 
