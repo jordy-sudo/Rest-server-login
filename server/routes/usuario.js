@@ -13,7 +13,7 @@ app.get("/usuario", function (req, res) {
   let limite = req.query.limite || 5;
   limite = Number(limite);
 
-  Usuario.find({estado:true}, 'nombre email role estado google img')
+  Usuario.find({estado:true}, 'caja fecha hora nombre email role estado google img')
     .skip(desde)
     .limit(limite)
     .exec((err, usuarios) => {
@@ -34,10 +34,15 @@ app.get("/usuario", function (req, res) {
   });
 });
 
+
+
 app.post("/usuario", function (req, res) {
   let body = req.body;
 
   let usuario = new Usuario({
+    caja: body.caja,
+    fecha: body.fecha,
+    hora: body.hora,
     nombre: body.nombre,
     email: body.email,
     password: bcrypt.hashSync(body.password, 10),
@@ -62,7 +67,7 @@ app.post("/usuario", function (req, res) {
 
 app.put("/usuario/:id", function (req, res) {
   let id = req.params.id;
-  let body = _.pick(req.body, ['nombre', 'email', 'img', 'role', 'estado']);
+  let body = _.pick(req.body, ['caja','fecha','hora','nombre', 'email', 'img', 'role', 'estado']);
 
   
 

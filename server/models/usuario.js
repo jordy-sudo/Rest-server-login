@@ -10,6 +10,18 @@ let rolesValidos = {
 }
 
 let usuarioSchema = new Schema({
+    caja:{
+        type: Number,
+        required: [true, 'El numero de caja es obligatorio']
+    },
+    fecha:{
+        type: Date,
+        required: [true, 'La fecha es obligatoria']
+    },
+    hora:{
+        type: String,
+        required: [true, 'La hora es obligatoria']
+    },
     nombre: {
         type: String,
         required: [true, 'El nombre es requerido']
